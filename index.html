@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kouzelník</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --back-color: white;
+        --text-color: black;
+        --back-transparent: #fffb;
+        --bar-back: #bbb;
+        --cont-hover-color: #6ac1ff;
+        --cont-color: #49a7eb;
+        --point-color: #49a7eb;
+    }
+    @media (prefers-color-scheme: dark){
+        :root{
+            --back-color: black;
+            --text-color: white;
+            --back-transparent: #000b;
+            --bar-back: #555;
+            --cont-hover-color: #0076c5;
+            --cont-color: #0062a3;
+            --point-color: #0067ab;
+        }
+        #map{
+            filter: brightness(63%) saturate(0%) contrast(460%) invert(100%);
+            -webkit-filter: brightness(63%) saturate(0%) contrast(460%) invert(100%);
+            -moz-filter: brightness(63%) saturate(0%) contrast(460%) invert(100%);        }
+        html{
+            background-image: url(background-dark.jpg);
+        }
+    }
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 700,
+  'GRAD' 0,
+  'opsz' 48
+}
+html{
+    color: var(--text-color);
+    background-size: cover;
+}
+#endScreen{
+    box-shadow:  0 0px 10px 0px #0005;
+    border-radius: 20px;
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: 50vh;
+    left: 50vw;
+    translate: -50% -50%;
+    background-color: var(--back-transparent);
+    backdrop-filter: blur(5px);
+    display: none;
+    grid-template-rows: 1fr auto;
+    animation: scaleIn 0.3s ease 0s 1 normal forwards;
+
+}
+.endMenu{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+.endButton{
+    position: relative;
+    background-color: var(--cont-color);
+    border-style: none;
+    border-radius: 15px;
+    padding: 5px;
+    font-size: 40px;
+    margin: 5px;
+    display: block;
+    width: 100%;
+    transition: box-shadow, top, background-color;
+    transition-duration: 0.1s;
+    top: 0;
+    transition-timing-function: ease;
+}
+.endButton:hover{
+    box-shadow:  0 5px 1px 0px #0005;
+    top: -5px;
+    background-color: var(--cont-hover-color);
+}
+.endButton:nth-child(1){
+    border-radius: 15px 7px 7px 15px;    
+}
+.endButton:nth-child(2){
+    margin: 5px 0;
+    border-radius: 7px;
+}
+.endButton:nth-child(3){
+    border-radius: 7px 15px 15px 7px;    
+}
+#scoreGraph{
+    height: 200px;
+    width: 200px;
+    background-color: var(--bar-back);
+    background: conic-gradient( var(--cont-color) 83%, var(--bar-back) 83%);
+    position: relative;
+    margin: auto;
+    border-radius: 100%;
+}
+#scoreWritten{
+    padding: 20px;
+    font-family: 'Montserrat', sans-serif;
+    position: absolute;
+    inset: 10px;
+    border-radius: 100%;
+    background-color: var(--back-color);
+    text-align: center;
+    font-size: 58px;
+}
+#mapWrap{
+    --border-radius: 30px;
+    border-radius: var(--border-radius);
+    position: absolute;
+    top: 100px;
+    bottom: 100px;
+    box-shadow:  0 0 10px 0px #0005;
+    display: grid;
+    grid-template-columns: auto 400px;
+}
+#map{
+    grid-area: 1/1;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    height: calc(100vh - 200px);
+    width: auto;
+}
+.mapMarks{
+    grid-area: 1/1;
+    position: relative;
+    cursor: pointer;
+}
+.mapPoint{
+    animation: rotateIn 0.3s ease 0s 1 normal;
+    transform: translateX(-50%);
+    position: absolute;
+    height: 50px;
+    transform-origin: bottom left;
+}
+.rotateOut{
+    animation: rotateOut 0.3s ease 0s 1 normal forwards;
+    transform: translateX(-50%);
+    position: absolute;
+    height: 50px;
+    transform-origin: bottom left;
+}
+.sidePanel{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+
+    grid-area: 1/2;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    background-color: var(--back-transparent);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+.sideStat{
+    box-shadow:  0 0 10px 0px #0003;
+    padding: 10px;
+    margin: 15px 15px 0 15px;
+    border-radius: 5px;
+    background-color: var(--back-color);
+}
+.writtenStat{
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.graphicStat{
+    overflow: hidden;
+    box-shadow:  0 3px 5px 0px #0003 inset;
+    margin-top: 10px;
+    height: 20px;
+    width: auto;
+    border-radius: 20px;
+    background-color: var(--bar-back);
+}
+.graphicBar{
+    box-shadow:  0 0 10px 0px #0005;
+    background-color: var(--cont-color);
+    border-radius: 20px;
+    height: 100%;
+    width: calc(20px + ((100% - 20px)* 0));
+    transition: width 0.3s;
+}
+#findTerm{
+    background-color: var(--cont-color);
+    /* width: 100%; */
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+}
+.findGraph{
+    transform: scale(1.5);
+    width: 1em;
+    height: 1em;
+    float: right;
+    position: relative;
+}
+#checkMark{
+    background-color: green;
+    position: absolute;
+    animation: popInOut 2s ease 0s 1 normal forwards;
+    border-radius: 100%;
+}
+.nextMark{
+    background-color: red;
+    position: absolute;
+    animation: popOut 0.3s ease 0s 1 normal forwards;
+    border-radius: 100%;
+    transition: inset 0.3s;
+}
+.popIn{
+    animation: popIn 0.3s ease 0s 1 normal forwards;
+}
+.scaleOut{
+    animation: scaleOut 0.3s ease 0s 1 normal forwards;
+}
+.shuffle{
+    animation: shuffle 0.4s ease 0s 1 normal;    
+}
+.flexBottom{
+    margin: auto 15px 15px 15px;
+}
+.left{
+    text-align: left;
+}
+.right{
+    text-align: right;
+}
+.hidden{
+    display: none;
+}
+@keyframes scaleIn {
+    from{scale: 0;}
+    to{scale: 1;}
+}
+@keyframes scaleOut {
+    from{scale: 1;}
+    to{scale: 0;}
+}
+@keyframes rotateIn {
+    0%{scale: 0; rotate: -90deg;}
+    100%{scale: 1; rotate: 0deg;}
+}@keyframes rotateOut {
+    0%{scale: 1; rotate: 0deg;}
+    100%{scale: 0; rotate: 90deg;}
+}
+@keyframes popInOut {
+    0%{inset: 100%; opacity: 0;}
+    9%{inset: -2px;}
+    14%{inset: 0; opacity: 1;}
+    91%{opacity: 1; inset: 0;}
+    100%{opacity: 0.5; inset: 100%;}
+}
+@keyframes popOut {
+    0%{inset: 100%; opacity: 0;}
+    80%{inset: -2px;}
+    100%{inset: 0; opacity: 1;}
+}@keyframes popIn {
+    100%{inset: 100%; opacity: 0;}
+    0%{inset: 0; opacity: 1;}
+}
+@keyframes shuffle {
+    0%{letter-spacing: 0px;}
+    50%{letter-spacing: -0.4em;}
+    100%{letter-spacing: 0px;}
+}
+</style>
+</head>
+<body>
+    <div class="idol hidden">
+        <svg class="mapPoint" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 29.5">
+            <path d="M 8 28 C 10 30 10 30 12 28 C 15 25 20 15 20 10 A 1 1 0 0 0 0 10 C 0 15 5 25 8 28" fill="var(--point-color)"/>
+            <path d="M 6 10 A 1 1 0 0 0 14 10 A 1 1 0 0 0 6 10" fill="var(--back-color)"/>
+        </svg>
+    </div>
+    <div id="mapWrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Blank_map_Europe_with_borders.png" alt="Erope map" id="map">
+        <div class="sidePanel">
+            <div class="sideStat">
+                <div class="writtenStat"><span class="left">Hotovo:</span><span class="right" id="finWrite">15% (7/59)</span></div>
+                <div class="graphicStat"><div class="graphicBar" id="finGraph"></div></div>
+            </div>
+            <div class="sideStat">
+                <div class="writtenStat"><span class="left">Správně:</span><span class="right" id="corWrite">0% (0/0)</span></div>
+                <div class="graphicStat"><div class="graphicBar" id="corGraph"></div></div>
+            </div>
+            <div class="sideStat flexBottom"><span>Najdi:
+                <div class="findGraph">
+                    <svg id="checkMark" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 -3 40 40"><path d="m 30 8 c 2 -2 3 -2 5 0 l 0 0 c 2 2 2 3 0 5 l -17 18 c -2 2 -3 2 -5 0 l -8 -8 c -2 -2 -2 -3 0 -5 c 2 -2 3 -2 5 0 l 5 5 z" fill="white"/></svg>
+                    <svg id="nextMark" class="hidden nextMark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><path d="M 35 17 C 37 19 37 21 35 23 L 29 29 C 27 31 26 31 24 29 C 22 27 22 26 24 24 L 25 23 L 6 23 C 4 23 3 22 3 20 C 3 18 4 17 6 17 L 25 17 L 24 16 C 22 14 22 13 24 11 C 26 9 27 9 29 11 Z" fill="white"/></svg>
+                </div></span>
+                <br><div id="findTerm">černá</div>
+            </div>
+        </div>
+        <div class="mapMarks">
+        </div>
+    </div>
+    <div id="endScreen">
+        <div id="scoreGraph">
+            <div id="scoreWritten">83%</div>
+        </div>
+        <div class="endMenu">
+            <button class="endButton material-symbols-outlined" onclick="resetGame()" title="opakovat">replay</button>
+            <button class="endButton material-symbols-outlined" onclick="showMistakes()" title="najít chyby">description</button>
+            <button class="endButton material-symbols-outlined" title="otázky">info</button>
+        </div>
+    </div>
+</body>
+<script src="locations.js" charset="UTF-8"></script>
+<script>
+locations = stolenShuffle(allLocations)
+let mistakes = []
+let mapHeight = window.innerHeight - 200
+let infos = {
+    finish: {
+        write: document.getElementById("finWrite"),
+        graph: document.getElementById("finGraph"),
+    },
+    correct: {
+        write: document.getElementById("corWrite"),
+        graph: document.getElementById("corGraph"),
+    },
+    find: {
+        term: document.getElementById("findTerm"),
+        check: document.getElementById("checkMark"),
+        next: document.getElementById("nextMark"),
+        point: document.getElementsByClassName("mapPoint"),
+    },
+    end: {
+        write: document.getElementById("scoreWritten"),
+        graph: document.getElementById("scoreGraph"),
+    },
+}
+let map = {
+    markWrap: document.getElementsByClassName("mapMarks")[0],
+    wrap: document.getElementById("mapWrap"),
+    id: document.getElementById("map"),
+    height: mapHeight,
+    width: (mapHeight / 1001) * 1200,
+    originalHeight: 1001,
+    originalWidth: 1200,
+    top: 100,
+    left: window.innerWidth / 2 - ((mapHeight / 1001) * 600) - 200,
+    mouseX: 0,
+    mouseY: 0,
+    current: 0,
+    revealing: false,
+    disabledClick: false,
+}
+let stats = {
+    questions: locations.length,
+    correct: 0,
+    wrong: 0,
+}
+
+
+function detectHit(clickCords){
+    for(let i = 2; i < locations[map.current].length; i++){
+        if(locations[map.current][i][0][0] < clickCords[0] && locations[map.current][i][1][0] > clickCords[0]
+            && locations[map.current][i][0][1] < clickCords[1] && locations[map.current][i][1][1] > clickCords[1]){
+            return true
+        }
+    }
+    return false
+}
+function nextQuestion(){
+        map.current++
+    if(map.current < locations.length){
+        infos.find.term.classList.add("shuffle")
+        setTimeout(()=>{
+            infos.find.term.innerText = locations[map.current][0]
+        },200)
+        setTimeout(()=>{infos.find.term.classList.remove("shuffle")},400)
+    }
+}
+function adjustScore(){
+    infos.finish.write.innerText = Math.ceil((stats.correct + stats.wrong) / stats.questions * 100) + "% (" + (stats.correct + stats.wrong) + "/" + stats.questions + ")"
+    infos.finish.graph.style.width = "calc(20px + ((100% - 20px)* " + Math.ceil((stats.correct + stats.wrong) / stats.questions * 100) / 100 +"))"
+    infos.correct.write.innerText = stats.correct + stats.wrong != 0 ? Math.ceil(stats.correct / (stats.correct + stats.wrong) * 100) + "% (" + stats.correct + "/" + (stats.correct + stats.wrong) + ")" : "0% (0/0)"
+    infos.correct.graph.style.width = stats.correct + stats.wrong != 0 ? "calc(20px + ((100% - 20px)* " + Math.ceil(stats.correct / (stats.correct + stats.wrong) * 100) / 100 +"))" : "20px"
+}
+function shuffleCards(oldArray){
+    oldOrder = []
+    newOrder = []
+    newArray = []
+    for(let i = 0; i < oldArray.length; i++){
+        oldArray.push(i)
+    }
+    while(oldOrder.length > 0){
+        itemOrder = Math.floor(Math.random() * oldOrder.length)
+        newOrder.push(oldOrder[itemOrder])
+        oldOrder.splice(itemOrder, 1)
+    }
+    for(let i in newOrder){
+        newArray.push(oldArray[newOrder[i]])
+    }
+    return newArray
+}
+function stolenShuffle(array) {
+    array.sort(() => Math.random() - 0.5);
+    return array
+}
+function showEndScreen(){
+    map.disabledClick = true
+    document.getElementById("endScreen").style.display = "grid"
+    infos.end.write.innerText = Math.ceil(stats.correct / (stats.correct + stats.wrong) * 100) + "%"
+    infos.end.graph.style.background = "conic-gradient( var(--cont-color) "+ Math.ceil(stats.correct / (stats.correct + stats.wrong) * 100) +"%, var(--bar-back) " + Math.ceil(stats.correct / (stats.correct + stats.wrong) * 100) +"%)"
+}
+function resetGame(){
+    document.getElementById("endScreen").classList.add("scaleOut")
+    setTimeout(()=>{
+        document.getElementById("endScreen").style.display = "none"
+        locations = stolenShuffle(allLocations)
+        stats.questions = locations.length
+        map.current = 0
+        stats.correct = 0
+        stats.wrong = 0
+        adjustScore()
+        map.disabledClick = false
+        infos.find.term.innerText = locations[map.current][0]
+    },300)
+}
+function showMistakes(){
+    if(mistakes.length > 0){
+        document.getElementById("endScreen").classList.add("scaleOut")
+        setTimeout(()=>{
+            document.getElementById("endScreen").style.display = "none"
+            map.current = 0
+            stats.correct = 0
+            stats.wrong = 0
+            adjustScore()
+            map.disabledClick = false
+            locations = mistakes
+            mistakes = []
+            stats.questions = locations.length
+            infos.find.term.innerText = locations[map.current][0]
+        },300)
+    }else{return false}
+}
+function showLocations(){
+    locations = allLocations
+    locations.sort(function(a, b){return a[1][1]-b[1][1]});
+    for(i in locations){
+        newPoint = infos.find.point[0].cloneNode(true);
+        newPoint.style.display = "block";
+        newPoint.style.bottom = (map.originalHeight - locations[i][1][1]) / map.originalHeight * 100 + "%";
+        newPoint.style.left = locations[i][1][0] / map.originalWidth * 100 + "%";
+        newPoint.classList.add("showPoint")
+        map.markWrap.appendChild(newPoint)
+    }
+}
+
+
+
+addEventListener('resize', (e) => {
+    mapHeight = window.innerHeight - 200
+    map.height = mapHeight
+    map.width = (mapHeight / 1001) * 1200
+    map.left = window.innerWidth / 2 - ((mapHeight / 1001) * 600) - 200,
+    map.wrap.style.left = map.left + "px";
+});
+addEventListener('click', (e) => {
+    let x = (e.clientX - map.left) / map.width * map.originalWidth; 
+    let y =( e.clientY - map.top) / map.height * map.originalHeight; 
+    map.mouseX = Math.floor(x)
+    map.mouseY = Math.floor(y)
+    if(map.revealing){
+        map.revealing = false
+        nextQuestion()
+        for(i = 1; i < infos.find.point.length; i++){
+            infos.find.point[i].classList.add("rotateOut")
+        }
+        infos.find.next.classList.add("popIn")
+        setTimeout(() => {
+            map.markWrap.innerHTML = ""
+            infos.find.next.style.display = "none"
+            infos.find.next.classList.remove("popIn")
+            map.disabledClick = false
+            if(stats.questions == stats.correct + stats.wrong){showEndScreen()}
+        }, 300)
+    }else if(e.clientX > map.left && e.clientX < map.left + map.width && e.clientY > map.top && e.clientY < map.top + map.height && stats.correct + stats.wrong < stats.questions && !map.disabledClick){
+        if(detectHit([map.mouseX, map.mouseY])){ //if correct
+            map.disabledClick = true
+            stats.correct++
+            adjustScore()
+            infos.find.check.style.display = "block"
+            setTimeout(() => {
+                infos.find.check.style.display = "none"
+                nextQuestion()
+                if(stats.questions == stats.correct + stats.wrong){showEndScreen()}
+            }, 2000)
+            setTimeout(()=>{map.disabledClick = false}, 2400)
+        }else{ //if wrong
+            map.disabledClick = true
+            map.revealing = true
+            mistakes.push(locations[map.current])
+            stats.wrong++
+            adjustScore()
+            newPoint = infos.find.point[0].cloneNode(true);
+            newPoint.style.display = "block";
+            newPoint.style.bottom = (map.originalHeight - locations[map.current][1][1]) / map.originalHeight * 100 + "%";
+            newPoint.style.left = locations[map.current][1][0] / map.originalWidth * 100 + "%";
+            map.markWrap.appendChild(newPoint)
+            infos.find.next.style.display = "block";
+        }
+    }
+});
+infos.finish.write.innerText = Math.ceil((stats.correct + stats.wrong) / stats.questions * 100) + "% (" + (stats.correct + stats.wrong) + "/" + stats.questions + ")"
+map.wrap.style.left = map.left + "px";
+infos.find.term.innerText = locations[map.current][0]
+</script>
+</html>

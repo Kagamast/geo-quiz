@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+<style>
+    @media (prefers-color-scheme: dark){
+        :root{
+            --back-color: white;
+            --back-transparent: #fffb;
+            --bar-back: #bbb;
+            --cont-color: #49a7eb;
+        }
+        /* #map{
+            --cont-color: #257;
+            filter: invert(1);
+        } */
+    }
+
+html{
+    background-image: url(background.jpg);
+    background-size: cover;
+}
+#mapWrap{
+    --border-radius: 30px;
+    border-radius: var(--border-radius);
+    position: absolute;
+    top: 100px;
+    bottom: 100px;
+    box-shadow:  0 0 10px 0px #0005;
+    display: grid;
+    grid-template-columns: auto 400px;
+}
+#map{
+    position: relative;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+    height: calc(100vh - 200px);
+    width: auto;
+}
+.sidePanel{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    background-color: var(--back-transparent);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+.sideStat{
+    box-shadow:  0 0 10px 0px #0003;
+    padding: 10px;
+    margin: 15px 15px 0 15px;
+    border-radius: 5px;
+    background-color: var(--back-color);
+}
+.writtenStat{
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.graphicStat{
+    overflow: hidden;
+    box-shadow:  0 3px 5px 0px #0003 inset;
+    margin-top: 10px;
+    height: 20px;
+    width: auto;
+    border-radius: 20px;
+    background-color: var(--bar-back);
+}
+.graphicBar{
+    box-shadow:  0 0 10px 0px #0005;
+    background-color: var(--cont-color);
+    border-radius: 20px;
+    height: 100%;
+    width: calc(20px + ((100% - 20px)* 0.4));
+    
+}
+#findTerm{
+    background-color: var(--cont-color);
+    /* width: 100%; */
+    border-radius: 5px;
+    padding: 5px;
+    margin-top: 5px;
+}
+.flexBottom{
+    margin: auto 15px 15px 15px;
+}
+.left{
+    text-align: left;
+}
+.right{
+    text-align: right;
+}
+</style>
+</head>
+<body>
+    <div id="mapWrap">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0c/Blank_map_Europe_with_borders.png" alt="Erope map" id="map">
+        <div class="sidePanel">
+            <div class="sideStat">
+                <div class="writtenStat"><span class="left">Hotovo:</span><span class="right" id="finWrite">15% (7/59)</span></div>
+                <div class="graphicStat"><div class="graphicBar" id="finGraph"></div></div>
+            </div>
+            <div class="sideStat">
+                <div class="writtenStat"><span class="left">Úspěšnost:</span><span class="right" id="corWrite">76% (5/7)</span></div>
+                <div class="graphicStat"><div class="graphicBar" id="corGraph"></div></div>
+            </div>
+            <div class="sideStat flexBottom"><span>Najdi:</span><br><div id="findTerm">černá</div></div>
+        </div>
+    </div>
+</body>
+<script src="locations.js"></script>
+<script>
+let mapHeight = window.innerHeight - 200
+let infos = {
+    finish: {
+        write: document.getElementById("finWrite"),
+        graph: document.getElementById("finGraph"),
+    },
+    correct: {
+        write: document.getElementById("corWrite"),
+        graph: document.getElementById("corGraph"),
+    },
+    find: {
+        term: document.getElementById("findTerm")
+    }
+}
+let map = {
+    wrap: document.getElementById("mapWrap"),
+    id: document.getElementById("map"),
+    height: mapHeight,
+    width: (mapHeight / 1001) * 1200,
+    originalHeight: 1001,
+    originalWidth: 1200,
+    top: 100,
+    left: window.innerWidth / 2 - ((mapHeight / 1001) * 600) - 200,
+    mouseX: 0,
+    mouseY: 0,
+    current: 0,
+}
+
+
+function detectHit(clickCords){
+    for(let i = 2; i < locations[map.current].length; i++){
+        if(locations[map.current][i][0][0] < clickCords[0] && locations[map.current][i][1][0] > clickCords[0]
+            && locations[map.current][i][0][1] < clickCords[1] && locations[map.current][i][1][1] > clickCords[1]){
+            return true
+        }
+    }
+    return false
+}
+
+
+addEventListener('resize', (e) => {
+    map.left = window.innerWidth / 2 - (((window.innerHeight - 200) / 1001) * 600) - 150
+    map.wrap.style.left = map.left + "px";
+});
+map.id.addEventListener('click', (e) => {
+    let x = (e.clientX - map.left) / map.width * map.originalWidth; 
+    let y =( e.clientY - map.top) / map.height * map.originalHeight; 
+    map.mouseX = Math.floor(x)
+    map.mouseY = Math.floor(y)
+    console.log(detectHit([map.mouseX, map.mouseY]))
+    infos.find.term.innerText = map.mouseX + ", " + map.mouseY
+});
+
+map.wrap.style.left = map.left + "px";
+infos.find.term.innerText = locations[map.current][0]
+</script>
+</html>
